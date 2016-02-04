@@ -9,6 +9,7 @@ import graphqlHTTP from 'express-graphql';
 import schema from './schema';
 import loaders from './lib/loaders';
 import config from './config';
+
 const {
   PORT,
   NODE_ENV,
@@ -46,12 +47,17 @@ app.get('/favicon.ico', (req, res) => {
 
 app.all('/graphql', (req, res) => res.redirect('/'));
 
-app.use('/', cors(), morgan('combined'), graphqlHTTP(() => {
+app.use('/', cors(), morgan('combined'), graphqlHTTP(request => {
   loaders.clearAll();
+
+  const accessToken = request.headers['x-access-token'];
 
   return {
     schema,
     graphiql: true,
+    rootValue: {
+      accessToken,
+    },
   };
 }));
 
