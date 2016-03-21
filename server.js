@@ -6,7 +6,7 @@ import express from 'express';
 import forceSSL from 'express-force-ssl';
 import graphqlHTTP from 'express-graphql';
 import schema from './schema';
-import loaders from './lib/loaders';
+import createLoaders from './lib/loaders';
 import config from './config';
 import { info, error } from './lib/loggers';
 import auth from './lib/auth';
@@ -51,15 +51,16 @@ app.all('/graphql', (req, res) => res.redirect('/'));
 app.use('/', auth, cors(), morgan('combined'), graphqlHTTP(request => {
   info('----------');
 
-  loaders.clearAll();
-
   const accessToken = request.headers['x-access-token'];
+  const loaders = createLoaders({
+    gravity: { accessToken },
+  });
 
   return {
     schema,
     graphiql: true,
     rootValue: {
-      accessToken,
+      loaders,
     },
   };
 }));

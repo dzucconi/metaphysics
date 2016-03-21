@@ -1,8 +1,7 @@
 import date from '../fields/date';
-import gravity from '../../lib/loaders/gravity';
-import Bidders from './bidders';
-import BidderPositions from './bidder_positions';
-import SaleRegistrations from './sale_registrations';
+// import Bidders from './bidders';
+// import BidderPositions from './bidder_positions';
+// import SaleRegistrations from './sale_registrations';
 import {
   GraphQLString,
   GraphQLObjectType,
@@ -18,14 +17,14 @@ const Me = new GraphQLObjectType({
     email: {
       type: GraphQLString,
     },
-    bidders: Bidders,
-    bidder_positions: BidderPositions,
-    sale_registrations: SaleRegistrations,
+    // bidders: Bidders,
+    // bidder_positions: BidderPositions,
+    // sale_registrations: SaleRegistrations,
   },
 });
 
 export default {
   type: Me,
-  resolve: (root, options, { rootValue: { accessToken } }) =>
-    gravity.with(accessToken)('me'),
+  resolve: (root, options, { rootValue: { loaders: { gravity } } }) =>
+    gravity.load('me', options, { cache: false }),
 };

@@ -1,7 +1,7 @@
-import gravity from '../lib/apis/gravity'; // Uncached
 import {
   GraphQLObjectType,
   GraphQLString,
+  GraphQLBoolean,
 } from 'graphql';
 
 const PingType = new GraphQLObjectType({
@@ -17,7 +17,14 @@ const PingType = new GraphQLObjectType({
 
 const Ping = {
   type: PingType,
-  resolve: () => gravity('system/ping'),
+  args: {
+    cache: {
+      type: GraphQLBoolean,
+      defaultValue: false,
+    },
+  },
+  resolve: (root, { cache }, { rootValue: { loaders: { gravity } } }) =>
+    gravity[cache ? 'cached' : 'uncached'].load('system/ping', { foo: 'bar' }),
 };
 
 export default Ping;
