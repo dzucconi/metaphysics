@@ -222,12 +222,14 @@ function startApp(appSchema, path: string) {
           userAgent,
         }
 
-        const validationRules: any[] = [principalFieldDirectiveValidation]
-        if (
-          // PRODUCTION_ENV &&
+        const validationRules = [
+          principalFieldDirectiveValidation,
+          // Conditionally disable introspection queries
+          ...(PRODUCTION_ENV &&
           req.headers["Authorization"] != "Bearer <SOMESECRET>"
-        )
-          validationRules.push(NoSchemaIntrospectionCustomRule)
+            ? [NoSchemaIntrospectionCustomRule]
+            : []),
+        ]
 
         if (QUERY_DEPTH_LIMIT)
           validationRules.push(depthLimit(QUERY_DEPTH_LIMIT))
