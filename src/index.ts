@@ -33,7 +33,9 @@ import { ErrorExtension } from "./extensions/errorExtension"
 import { LoggingExtension } from "./extensions/loggingExtension"
 import { principalFieldDirectiveExtension } from "./extensions/principalFieldDirectiveExtension"
 import { principalFieldDirectiveValidation } from "validations/principalFieldDirectiveValidation"
+import { NoSchemaIntrospectionCustomRule } from "validations/noSchemaIntrospectionCustomRule"
 import * as Sentry from "@sentry/node"
+// import { ASTVisitor } from "graphql"
 
 const {
   ENABLE_REQUEST_LOGGING,
@@ -220,7 +222,13 @@ function startApp(appSchema, path: string) {
           userAgent,
         }
 
-        const validationRules = [principalFieldDirectiveValidation]
+        const validationRules: any[] = [principalFieldDirectiveValidation]
+        if (
+          // PRODUCTION_ENV &&
+          req.headers["Authorization"] != "Bearer <SOMESECRET>"
+        )
+          validationRules.push(NoSchemaIntrospectionCustomRule)
+
         if (QUERY_DEPTH_LIMIT)
           validationRules.push(depthLimit(QUERY_DEPTH_LIMIT))
 
